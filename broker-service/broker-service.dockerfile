@@ -1,21 +1,22 @@
 # Base go image
-FROM golang:1.25.0-alpine AS builder
+# FROM golang:1.25.0-alpine AS builder
 
-RUN mkdir /app
+# RUN mkdir /app
 
-COPY . /app
+# COPY . /app
 
-WORKDIR /app
+# WORKDIR /app
 
-RUN CGO_ENABLED=0 go build -o brokerApp ./cmd/api
+# RUN CGO_ENABLED=0 go build -o brokerApp ./cmd/api
 
-RUN chmod +x /app/brokerApp
+# RUN chmod +x /app/brokerApp
 
 # Build tiny docker image
 FROM alpine:latest
 
 RUN mkdir /app
 
-COPY --from=builder /app/brokerApp /app
+# COPY --from=builder /app/brokerApp /app
+COPY brokerApp /app
 
 CMD ["/app/brokerApp"]
