@@ -19,3 +19,11 @@
 *.dylib
 *.test
 *.out
+
+# Compiled binaries
+brokerApp
+frontApp
+authApp
+
+# Docker volumes
+project/db-data/
