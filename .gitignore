@@ -25,6 +25,7 @@ brokerApp
 frontApp
 authApp
 loggerServiceApp
+mailerApp
 
 # Docker volumes
 project/db-data/
