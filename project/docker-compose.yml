@@ -25,6 +25,15 @@ services:
     depends_on:
       - postgres
 
+  logger-service:
+    build:
+      context: ./../logger-service
+      dockerfile: ./../logger-service/logger-service.dockerfile
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+
   postgres:
     image: postgres:17.5-alpine
     environment:
@@ -36,6 +45,21 @@ services:
     restart: always
     volumes:
       - ./db-data/postgres:/var/lib/postgresql/data
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  mongo:
+    image: mongo:6.0.26-jammy
+    environment:
+      MONGO_INITDB_DATABASE: logs
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - "27017:27017"
+    restart: always
+    volumes:
+      - ./db-data/mongo:/data/db
     deploy:
       mode: replicated
       replicas: 1
