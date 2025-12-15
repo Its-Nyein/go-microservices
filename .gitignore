@@ -26,6 +26,7 @@ frontApp
 authApp
 loggerServiceApp
 mailerApp
+listenerServiceApp
 
 # Docker volumes
 project/db-data/

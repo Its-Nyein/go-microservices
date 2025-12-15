@@ -52,6 +52,15 @@ services:
       MAIL_FROM_ADDRESS: "itsnyein@example.com"
       MAIL_FROM_NAME: "itsnyein"
 
+  listener-service:
+    build:
+      context: ./../listener-service
+      dockerfile: ./../listener-service/listener-service.dockerfile
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+
   postgres:
     image: postgres:17.5-alpine
     environment:
