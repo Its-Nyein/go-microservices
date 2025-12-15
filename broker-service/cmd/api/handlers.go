@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"net/rpc"
 )
 
 type requestPayload struct {
@@ -32,6 +33,11 @@ type mailPayload struct {
 	Message string `json:"message"`
 }
 
+type RPCPayload struct {
+	Name string
+	Data string
+}
+
 func (app *Config) Broker(w http.ResponseWriter, r *http.Request) {
 	payload := jsonResponse{
 		Error:   false,
@@ -55,7 +61,8 @@ func (app *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 		app.Authenticate(w, requestPayload.Auth)
 	case "log":
 		// app.LogItem(w, requestPayload.Log)
-		app.LogEventViaRabbit(w, requestPayload.Log)
+		// app.LogEventViaRabbit(w, requestPayload.Log)
+		app.LogEventViaRPC(w, requestPayload.Log)
 	case "mail":
 		app.SendMail(w, requestPayload.Mail)
 	default:
@@ -211,4 +218,30 @@ func (app *Config) PushToQueue(name, message string) error {
 	}
 
 	return nil
+}
+
+func (app *Config) LogEventViaRPC(w http.ResponseWriter, l logPayload) {
+	client, err := rpc.Dial("tcp", "logger-service:5001")
+
+	if err != nil {
+		app.ErrorJSON(w, err, http.StatusInternalServerError)
+		return
+	}
+	defer client.Close()
+
+	rpcPayload := RPCPayload(l)
+
+	var result string
+	err = client.Call("RPCServer.LogInfo", rpcPayload, &result)
+	if err != nil {
+		app.ErrorJSON(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	payload := jsonResponse{
+		Error:   false,
+		Message: result,
+	}
+
+	app.WriteJSON(w, http.StatusAccepted, payload)
 }
